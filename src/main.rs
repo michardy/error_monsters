@@ -1,5 +1,8 @@
+extern crate error_monsters_404;
+
 use std::env;
 use std::collections::HashMap;
+//use error_monsters_404;
 
 struct BigType {
     characters:[[[u8; 11]; 11]; 6],
@@ -142,15 +145,22 @@ fn main() {
             .iter().cloned().collect();
 
     //start writing a page
-    println!("Content-Type:text/html");
+    println!("Content-Type:text/html;charset=UTF-8");
     println!("Status: {} {}\n\n", hum_code, desc.get(&code).unwrap());
     println!("<!DOCTYPE html><html><head><title>");
     println!("{}, {}", hum_code, desc.get(&code).unwrap());
     println!("</title></head><body><pre>");
     let mut error = BigType::new(code);
+    let mut map: error_monsters_404::Map = match hum_code.as_ref() {
+	"404" => error_monsters_404::Map::new(),
+        _ => error_monsters_404::Map::new()
+    };
     for i in 0..11 {
+        map.print_lside();
         error.print_row();
+        map.print_rside();
         print!("\r\n");
     }
+    map.print_end();
     println!("</pre></body></html>")
 }

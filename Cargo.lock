@@ -1,4 +1,11 @@
 [root]
 name = "error-monsters"
 version = "0.1.0"
+dependencies = [
+ "error_monsters_404 0.1.0",
+]
+
+[[package]]
+name = "error_monsters_404"
+version = "0.1.0"
 
