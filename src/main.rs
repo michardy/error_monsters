@@ -1,8 +1,8 @@
-
+use std::env;
 use std::collections::HashMap;
 
 struct BigType {
-    characters:[[[u8; 11]; 11]; 5],
+    characters:[[[u8; 11]; 11]; 6],
     cur_row: u8,
     code: [u8; 3],
 }
@@ -75,6 +75,19 @@ impl BigType {
                     [32, 32, 32, 32, 32, 32, 32, 32, 35, 35, 35],
                     [32, 32, 32, 32, 32, 32, 32, 32, 35, 35, 35],
                     [32, 32, 32, 32, 32, 32, 32, 32, 35, 35, 35]
+                ],
+                [
+                    [35, 35, 35, 35, 35, 35, 35, 35, 35, 35, 35],
+                    [35, 35, 35, 35, 35, 35, 35, 35, 35, 35, 35],
+                    [35, 35, 35, 32, 32, 32, 32, 32, 32, 32, 32],
+                    [35, 35, 35, 35, 35, 35, 35, 32, 32, 32, 32],
+                    [32, 32, 32, 32, 32, 35, 35, 35, 35, 32, 32],
+                    [32, 32, 32, 32, 32, 32, 32, 35, 35, 35, 32],
+                    [32, 32, 32, 32, 32, 32, 32, 32, 35, 35, 35],
+                    [32, 32, 32, 32, 32, 32, 32, 32, 35, 35, 35],
+                    [32, 32, 32, 32, 32, 32, 32, 35, 35, 35, 32],
+                    [32, 32, 32, 32, 32, 35, 35, 35, 35, 32, 32],
+                    [35, 35, 35, 35, 35, 35, 32, 32, 32, 32, 32],
                 ]
             ],
             cur_row: 0u8,
@@ -95,8 +108,16 @@ impl BigType {
 }
 
 fn main() {
-    let hum_code = "404";
-    let code = [4u8, 0u8, 4u8];
+    let key = "QUERY_STRING";
+    let hum_code = match env::var(key) {
+        Ok(val) => val,
+        Err(e) => "500".to_string(),
+    };
+    let ecbs = hum_code.as_bytes();
+    let mut code = [0u8, 0u8, 0u8];
+    for i in 0..3 {
+        code[i] = ecbs[i] - 48;
+    }
 
     let desc: HashMap<[u8; 3], String> = [([4u8, 0u8, 0u8], "Bad Request".to_string()),
 	([4u8, 0u8, 1u8], "Unauthorized".to_string()),
@@ -121,8 +142,8 @@ fn main() {
             .iter().cloned().collect();
 
     //start writing a page
-    println!("HTTP/1.1 {} {}\r\n", hum_code, desc.get(&code).unwrap());
-    println!("Content-Type:text/html\r\n");
+    println!("Content-Type:text/html");
+    println!("Status: {} {}\n\n", hum_code, desc.get(&code).unwrap());
     println!("<!DOCTYPE html><html><head><title>");
     println!("{}, {}", hum_code, desc.get(&code).unwrap());
     println!("</title></head><body><pre>");
